@@ -15,8 +15,8 @@ func TestBusinessValidation(t *testing.T) {
 		FoundAt:     now.Add(-24 * time.Hour),
 	}
 
-	v := &rapidval.Validator{}
-	err := business.Validate(v)
+	v := rapidval.New()
+	err := v.Validate(business)
 	if err == nil {
 		t.Error("validation should fail")
 	}
@@ -63,8 +63,8 @@ func TestUserValidation(t *testing.T) {
 		Age:       15,
 	}
 
-	v := &rapidval.Validator{}
-	err := user.Validate(v)
+	v := rapidval.New()
+	err := v.Validate(user)
 	if err == nil {
 		t.Error("validation should fail")
 	}

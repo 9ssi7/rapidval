@@ -10,8 +10,8 @@ type User struct {
 	Age       int
 }
 
-func (u *User) Validate(v *rapidval.Validator) error {
-	return v.Validate(rapidval.P{
+func (u *User) Validations() rapidval.P {
+	return rapidval.P{
 		rapidval.Required("FirstName", u.FirstName),
 		rapidval.Required("LastName", u.LastName),
 		rapidval.MinLength("FirstName", u.FirstName, 2),
@@ -22,5 +22,5 @@ func (u *User) Validate(v *rapidval.Validator) error {
 		rapidval.MinLength("Password", u.Password, 8),
 		rapidval.Required("Age", u.Age),
 		rapidval.Between("Age", u.Age, 18, 100),
-	})
+	}
 }

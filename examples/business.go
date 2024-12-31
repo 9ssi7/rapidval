@@ -12,9 +12,9 @@ type Business struct {
 	FoundAt     time.Time
 }
 
-func (b *Business) Validate(v *rapidval.Validator) error {
+func (b *Business) Validations() rapidval.P {
 	now := time.Now()
-	return v.Validate(rapidval.P{
+	return rapidval.P{
 		rapidval.Required("Title", b.Title),
 		rapidval.Required("Description", b.Description),
 		rapidval.Required("FoundAt", b.FoundAt),
@@ -24,5 +24,5 @@ func (b *Business) Validate(v *rapidval.Validator) error {
 		rapidval.MaxLength("Description", b.Description, 1000),
 		rapidval.DateGreaterThan("FoundAt", b.FoundAt, now),
 		rapidval.DateLessThan("FoundAt", b.FoundAt, now.Add(24*time.Hour)),
-	})
+	}
 }

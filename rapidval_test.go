@@ -5,6 +5,35 @@ import (
 	"time"
 )
 
+type testStruct struct{}
+
+func (t *testStruct) Validations() P {
+	return P{}
+}
+
+type testStruct2 struct{}
+
+func (t *testStruct2) Validations() P {
+	return P{
+		Required("name", ""),
+		Email("email", "invalid"),
+	}
+}
+
+type testStruct3 struct {
+	Name  string
+	Email string
+	Age   int
+}
+
+func (t *testStruct3) Validations() P {
+	return P{
+		MinLength("Name", t.Name, 2),
+		Email("Email", t.Email),
+		Between("Age", t.Age, 18, 100),
+	}
+}
+
 func TestRequired(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -398,22 +427,19 @@ func TestValidator(t *testing.T) {
 	v := &Validator{}
 
 	t.Run("empty params", func(t *testing.T) {
-		if err := v.Validate(P{}); err != nil {
+		if err := v.Validate(&testStruct{}); err != nil {
 			t.Errorf("Validate() with empty params returned error: %v", err)
 		}
 	})
 
 	t.Run("nil error", func(t *testing.T) {
-		if err := v.Validate(P{nil}); err != nil {
+		if err := v.Validate(&testStruct{}); err != nil {
 			t.Errorf("Validate() with nil error returned error: %v", err)
 		}
 	})
 
 	t.Run("with errors", func(t *testing.T) {
-		err := v.Validate(P{
-			Required("name", ""),
-			Email("email", "invalid"),
-		})
+		err := v.Validate(&testStruct2{})
 		if err == nil {
 			t.Error("Validate() should return error")
 		}
@@ -569,23 +595,13 @@ func BenchmarkValidations(b *testing.B) {
 
 func BenchmarkValidator(b *testing.B) {
 	v := &Validator{}
-	user := struct {
-		Name  string
-		Email string
-		Age   int
-	}{
-		Name:  "J",
-		Email: "invalid",
-		Age:   15,
-	}
-
 	b.Run("Multiple Validations", func(b *testing.B) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
-			v.Validate(P{
-				MinLength("Name", user.Name, 2),
-				Email("Email", user.Email),
-				Between("Age", user.Age, 18, 100),
+			v.Validate(&testStruct3{
+				Name:  "John",
+				Email: "john@example.com",
+				Age:   25,
 			})
 		}
 	})

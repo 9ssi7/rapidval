@@ -24,6 +24,15 @@ import (
 	"time"
 )
 
+// Validateable is an interface that can be implemented by any struct to add custom validation logic.
+// It allows for custom validation logic to be added to a struct without having to implement the Validate method.
+type Validateable interface {
+
+	// Validations is a method that can be implemented by any struct to add custom validation logic.
+	// It allows for custom validation logic to be added to a struct without having to implement the Validate method.
+	Validations() P
+}
+
 // ValidationError represents a single validation error.
 // It contains the field name, message key, and any parameters needed for translation.
 type ValidationError struct {
@@ -62,7 +71,8 @@ type P []*ValidationError
 
 // Validate processes all validation rules and returns any validation errors.
 // If there are no errors, it returns nil.
-func (v *Validator) Validate(params P) error {
+func (v *Validator) Validate(val Validateable) error {
+	params := val.Validations()
 	if len(params) == 0 {
 		return nil
 	}
@@ -238,4 +248,9 @@ func isZero(v interface{}) bool {
 		return true
 	}
 	return false
+}
+
+// New returns a new Validator.
+func New() *Validator {
+	return &Validator{}
 }
